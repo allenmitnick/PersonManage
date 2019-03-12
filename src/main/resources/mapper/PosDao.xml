@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyt.dao.PosDao">
+    <!-- 自定义结果集 -->
+    <resultMap id="posMap" type="Pos">
+        <id property="posId" column="pos_id"/>
+        <result property="posName" column="pos_name"/>
+        <result property="posDescription" column="pos_description"/>
+        <collection property="empList" ofType="Emp">
+            <id property="empId" column="emp_id"/>
+            <result property="empName" column="emp_name"/>
+            <result property="sex" column="sex"/>
+            <result property="phone" column="phone"/>
+            <result property="email" column="email"/>
+            <result property="address" column="address"/>
+            <result property="education" column="education"/>
+            <result property="birthday" column="birthday"/>
+        </collection>
+    </resultMap>
+
+    <!--1.public Integer insertPos(Pos pos);-->
+    <insert id="insertPos" parameterType="Pos" useGeneratedKeys="true" keyProperty="pos_id">
+        INSERT INTO tb_pos(pos_name, pos_description)
+        VALUES (#{posName}, #{posDescription})
+    </insert>
+
+    <!--2.public Integer updatePos(Pos pos);-->
+    <update id="updatePos" parameterType="Pos">
+        UPDATE tb_pos
+        <set>
+            <if test="posName != null and posName != '' ">
+                pos_name = #{posName},
+            </if>
+
+            <if test="posDescription != null and posDescription != '' ">
+                pos_description = #{posDescription}
+            </if>
+        </set>
+        WHERE pos_id = #{posId}
+    </update>
+
+    <!--3.public Integer deletePos(Integer posId);-->
+    <delete id="deletePos" parameterType="integer">
+        DELETE FROM tb_pos WHERE pos_id = #{posId}
+    </delete>
+
+
+    <!--4.public List<Pos> findPoss(@Param("params") Map<String, Object> map);-->
+    <!--if的条件里的值是entity的属性-->
+    <select id="findPoss" resultMap="posMap" parameterType="map">
+        SELECT p.pos_id, p.pos_name, p.pos_description,
+        e.emp_id,e.emp_name,e.sex,e.phone,e.email,e.address,e.education,e.birthday
+        FROM tb_pos p LEFT JOIN tb_emp e
+        ON e.pos_id = p.pos_id
+        <where>
+            <if test="params.posName!=null and params.posName!='' ">
+                AND p.pos_name like #{params.posName}
+            </if>
+            <if test="params.posId != null and params.posId!= 0">
+                AND p.pos_id = #{params.posId}
+            </if>
+        </where>
+
+    </select>
+
+    <!--5.public Integer getCount(@Param("params") Map<String, Object> map);-->
+    <select id="getCount" parameterType="map" resultType="integer">
+        SELECT count(*)
+        FROM tb_pos
+        <where>
+
+            <if test="params.posName!=null and params.posName!='' ">
+                pos_name like #{params.posName}
+            </if>
+
+        </where>
+    </select>
+
+</mapper>

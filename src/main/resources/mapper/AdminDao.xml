@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyt.dao.AdminDao">
+
+    <resultMap id="adminMap" type="Admin">
+        <id property="adminId" column="admin_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="roleName" column="role_name"/>
+        <collection property="postList" ofType="Post">
+            <id property="postId" column="post_id"/>
+            <result property="postTitle" column="post_title"/>
+            <result property="postContent" column="post_content"/>
+            <result property="postCreateTime" column="post_create_time"/>
+        </collection>
+    </resultMap>
+
+    <!--1.public Integer insertAdmin(Admin admin);-->
+    <insert id="insertAdmin" parameterType="Admin" useGeneratedKeys="true" keyProperty="admin_id">
+        INSERT INTO tb_admin(username, password, role_name)
+        VALUES (#{username}, #{password}, #{roleName})
+    </insert>
+
+    <!--2.public Integer updateAdmin(Admin admin);-->
+    <update id="updateAdmin" parameterType="Admin">
+        UPDATE tb_admin
+        <set>
+            <if test="username != null and username != '' ">
+                username = #{username},
+            </if>
+
+            <if test="password != null and password != '' ">
+                password = #{password}
+            </if>
+        </set>
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <!--3.public Integer deleteAdmin(Integer adminId);-->
+    <delete id="deleteAdmin" parameterType="integer">
+        DELETE FROM tb_admin WHERE admin_id = #{adminId}
+    </delete>
+
+    <!--可能返回多个结果，但是只需要一条，可以使用limit-->
+    <!--4.public Admin login(Admin admin);-->
+    <select id="login" parameterType="Admin" resultType="Admin">
+        SELECT admin_id, username, password, role_name
+        FROM tb_admin
+        WHERE username = #{username}
+        AND password = #{password}
+        LIMIT 0,1
+    </select>
+
+    <!--5.public List<Admin> findAdmins(Map<String, Object> map);-->
+    <select id="findAdmins" resultMap="adminMap" parameterType="map">
+        SELECT a.admin_id,a.username,a.password,a.role_name,p.post_id,p.post_title,p.post_content,p.post_create_time
+        FROM tb_admin a LEFT JOIN tb_post p
+        ON p.admin_id = a.admin_id
+        <where>
+            <if test="params.username!=null and params.username!='' ">
+                AND a.username like #{params.username}
+            </if>
+            <if test="params.adminId!=null and params.adminId !=0 ">
+                AND a.admin_id = #{params.adminId}
+            </if>
+        </where>
+    </select>
+
+    <!--6.public Integer getCount(@Param("params") Map<String, Object> map);-->
+    <select id="getCount" parameterType="map" resultType="int">
+        SELECT count(*)
+        FROM tb_admin
+        <where>
+            <if test="params.username!=null and params.username!='' ">
+                username like #{params.username}
+            </if>
+        </where>
+    </select>
+
+</mapper>

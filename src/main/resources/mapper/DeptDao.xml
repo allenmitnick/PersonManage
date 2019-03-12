@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyt.dao.DeptDao">
+    <!-- 自定义结果集 -->
+    <resultMap id="deptMap" type="Dept">
+        <id property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="deptDescription" column="dept_description"/>
+        <collection property="empList" ofType="Emp">
+            <id property="empId" column="emp_id"/>
+            <result property="empName" column="emp_name"/>
+            <result property="sex" column="sex"/>
+            <result property="phone" column="phone"/>
+            <result property="email" column="email"/>
+            <result property="address" column="address"/>
+            <result property="education" column="education"/>
+            <result property="birthday" column="birthday"/>
+        </collection>
+    </resultMap>
+
+    <!--1.public Integer insertDept(Dept dept);-->
+    <insert id="insertDept" parameterType="Dept" useGeneratedKeys="true" keyProperty="dept_id">
+        INSERT INTO tb_dept(dept_name, dept_description)
+        VALUES (#{deptName}, #{deptDescription})
+    </insert>
+
+    <!--2.public Integer updateDept(Dept dept);-->
+    <update id="updateDept" parameterType="Dept">
+        UPDATE tb_dept
+        <set>
+            <if test="deptName != null and deptName != '' ">
+                dept_name = #{deptName},
+            </if>
+
+            <if test="deptDescription != null and deptDescription != '' ">
+                dept_description = #{deptDescription}
+            </if>
+        </set>
+        WHERE dept_id = #{deptId}
+    </update>
+
+    <!--3.public Integer deleteDept(Integer deptId);-->
+    <delete id="deleteDept" parameterType="integer">
+        DELETE FROM tb_dept WHERE dept_id = #{deptId}
+    </delete>
+
+
+    <!--4.public List<Admin> findDepts(Map<String, Object> map);-->
+    <!--if的条件里的值是entity的属性-->
+    <select id="findDepts" resultMap="deptMap" parameterType="map">
+        SELECT d.dept_id, d.dept_name, d.dept_description,
+        e.emp_id,e.emp_name,e.sex,e.phone,e.email,e.address,e.education,e.birthday
+        FROM tb_dept d LEFT JOIN tb_emp e
+        ON e.dept_id = d.dept_id
+        <where>
+            <if test="params.deptName!=null and params.deptName!='' ">
+                AND d.dept_name like #{params.deptName}
+            </if>
+            <if test="params.deptId != null and params.deptId!= 0">
+                AND d.dept_id = #{params.deptId}
+            </if>
+        </where>
+
+    </select>
+
+    <!--5.public Integer getCount(@Param("params") Map<String, Object> map);-->
+    <select id="getCount" parameterType="map" resultType="integer">
+        SELECT count(*)
+        FROM tb_dept
+        <where>
+
+            <if test="params.deptName!=null and params.deptName!='' ">
+                dept_name like #{params.deptName}
+            </if>
+
+        </where>
+    </select>
+
+</mapper>

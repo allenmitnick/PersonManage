@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyt.dao.PostDao">
+
+    <resultMap id="postMap" type="Post">
+        <id property="postId" column="post_id"/>
+        <result property="postTitle" column="post_title"/>
+        <result property="postContent" column="post_content"/>
+        <result property="postCreateTime" column="post_create_time"/>
+        <association property="postAdmin" javaType="Admin">
+            <id property="adminId" column="admin_id"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+
+    <!--1.public Integer insertPost(Post post);-->
+    <insert id="insertPost" parameterType="Post" useGeneratedKeys="true" keyProperty="post_id">
+        INSERT INTO tb_post(post_title, post_content, post_create_time, admin_id)
+        VALUES (#{postTitle}, #{postContent}, #{postCreateTime}, #{postAdmin.adminId})
+    </insert>
+
+    <!--2.public Integer updatePost(Post post);-->
+    <update id="updatePost" parameterType="Post">
+        UPDATE tb_post
+        <set>
+            <if test="postTitle != null and postTitle != '' ">
+                post_title = #{postTitle},
+            </if>
+
+            <if test="postContent != null and postContent != '' ">
+                post_content = #{postContent}
+            </if>
+            <if test="postCreateTime != null">
+                post_create_time = #{postCreateTime}
+            </if>
+            <if test="postAdmin != null">
+                admin_id = #{postAdmin.adminId}
+            </if>
+        </set>
+        WHERE post_id = #{postId}
+    </update>
+
+    <!--3.public Integer deletePost(Integer postId);-->
+    <delete id="deletePost" parameterType="integer">
+        DELETE FROM tb_post WHERE post_id = #{postId}
+    </delete>
+
+
+    <!--4.public List<Post> findPosts(@Param("params") Map<String, Object> map);-->
+    <select id="findPosts" resultMap="postMap" parameterType="map">
+        SELECT p.post_id,p.post_title,p.post_content,p.post_create_time,a.admin_id,a.username
+        FROM tb_post p LEFT JOIN tb_admin a
+        ON p.admin_id = a.admin_id
+        <where>
+            <if test="params.postId!=null and params.postId!=0 ">
+                AND p.post_id like #{params.postId}
+            </if>
+            <if test="params.postTitle!=null and params.postTitle!='' ">
+                AND p.post_title like #{params.postTitle}
+            </if>
+            <if test="params.adminId !=null and params.adminId != 0">
+                AND p.admin_id = #{params.adminId}
+            </if>
+        </where>
+    </select>
+
+    <!--resultType="integer" 必须要加的 ，默认返回影响的行数-->
+    <!--5.public Integer getCount(@Param("params") Map<String, Object> map);-->
+    <select id="getCount" parameterType="map" resultType="integer">
+        SELECT count(*)
+        FROM tb_post
+        <where>
+            <if test="params.postTitle!=null and params.postTitle!='' ">
+                post_title like #{params.postTitle}
+            </if>
+        </where>
+    </select>
+
+    <!--public Post findLastedPost();-->
+    <select id="findLastedPost" resultMap="postMap">
+         SELECT p.post_id, p.post_title,p.post_content,p.post_create_time,a.admin_id,a.username
+         FROM tb_post p LEFT JOIN tb_admin a
+         ON p.admin_id = a.admin_id
+         ORDER BY p.post_create_time DESC
+LIMIT 1;
+    </select>
+
+</mapper>

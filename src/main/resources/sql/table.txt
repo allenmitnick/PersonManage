@@ -1,0 +1,90 @@
+#创建数据库
+create database personmanage charset utf8;
+
+#使用此数据库
+use personmanage
+
+#管理员表
+create table `tb_admin`(
+  #主键，id
+  `admin_id` int not null  auto_increment,
+  #用户名
+  `username` varchar(128) not null default '',
+  `password` varchar(128) not null default '',
+  `role_name` varchar(128) not null default '',
+  primary key (`admin_id`)
+)engine= InnoDB auto_increment=1 default charset=utf8;
+
+insert into `tb_admin`(username, password, role_name) values
+('test', 'test', 'test'),
+('admin1', 'admin1', 'normaladmin'),
+('superadmin', 'superadmin', 'superadmin');
+
+#部门表
+create table `tb_dept`(
+  `dept_id` int not null auto_increment,
+  `dept_name` varchar(64) not null default '',
+  `dept_description` varchar(1024),
+  primary key (`dept_id`)
+)engine = InnoDB auto_increment=1 default charset =utf8;
+
+insert into `tb_dept`(dept_name, dept_description) values
+('产品','软件产品'),
+('销售','销售产品'),
+('课程','课程制作')
+;
+
+#职位表
+create table `tb_pos`(
+  `pos_id` int not null auto_increment,
+  `pos_name` varchar(64) not null default '',
+  `pos_description` varchar(1024),
+  primary key (`pos_id`)
+)engine = InnoDB auto_increment=1 default charset =utf8;
+
+insert into `tb_pos`(pos_name, pos_description) values
+('销售经理','管理销售团队'),
+('java课程人员','做java课程'),
+('前端工程师','前端开发'),
+('销售人员','销售产品')
+;
+
+#员工表
+create table `tb_emp`(
+  `emp_id` int not null auto_increment,
+  `emp_name` varchar(64) not null default '',
+  `sex` varchar(2)not null default '男',
+  `phone` varchar(24) not null default '',
+  `email` varchar(64) default '',
+  `address` varchar(256) default '',
+  `education` varchar(24) default '',
+  `birthday` datetime default null,
+  `dept_id` int,
+  `pos_id` int,
+  primary key (`emp_id`)
+)engine = InnoDB auto_increment=1 default charset =utf8;
+
+insert into `tb_emp`(emp_id, emp_name, sex, phone, email, address, education, birthday, dept_id, pos_id)
+values (1001, '雷军', '男' , '17826076211', 'jielunzhou@163.com', '镇江市京口区学府路301号',
+        '本科', '1996-08-01 02:21:21',2,1 ),
+       (1002, '销售小吴', '女' , '17826076212', 'ji22lunzhou@163.com', '镇江市京口区学府路303号',
+        '大专', '1993-08-01 04:21:21',2,4 ),
+       (1003, '前端小王', '男' , '17826076214', 'wangelunzhou@163.com', '上海市京口区学府路304号',
+        '研究生', '1994-08-01 02:21:21',1,3 ),
+       (1004, '胡老师', '男' , '17826076216', 'hunzhou@163.com', '北京市京口区学府路304号',
+        '本科', '1992-08-01 04:21:21',3,2 );
+
+
+
+#公告表
+create table `tb_post`(
+  `post_id` int not null auto_increment,
+  `post_title` varchar(512) not null default '',
+  `post_content` varchar(1024),
+  `post_create_time` datetime  default null,
+  `admin_id` int,
+  primary key (`post_id`)
+)engine = InnoDB auto_increment=1 default charset =utf8;
+
+insert into `tb_post`(post_title, post_content, post_create_time, admin_id)
+values ('放假通知','请注意节假日安全',now(), 1) ;
