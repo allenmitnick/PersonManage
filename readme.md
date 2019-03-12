@@ -30,12 +30,12 @@
 
 
 
-![emplist](E:\PersonManage\emplist.png)
+![emplist](emplist.png)
 
-![empadd](E:\PersonManage\empadd.png)
+![empadd](empadd.png)
 
-![deptlist](E:\PersonManage\deptlist.png)
+![deptlist](deptlist.png)
 
-![deptadd](E:\PersonManage\deptadd.png)
+![deptadd](deptadd.png)
 
-![postlist](E:\PersonManage\postlist.png)
+![postlist](postlist.png)
